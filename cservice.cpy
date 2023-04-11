@@ -1,1 +1,59 @@
-gAAAAABkNYM5vT3OFzu3tcby5e1rTjO2duzObn7TpP9P5fUqkcw5Bj3_dMmJKTENb34oulzU7tV9SRF74dixgVbPgvGHl33JhJEmB6fT8Yie1K09ivOYdti0ks6niEV1MIHHnUdbQvwCoXdC6p8iXbsNhZUf-v3y-ezmVmBHzzYrykAnyjpjAjGVcllY1pOBJD7xtzGOjzgJ0IPhiyOYhlEefnRoTKuYGbyvW6eRMIF7Dj-_A_pf6fKU5x3Gu67t6XxS-CFrQ4Lct-M-Wne7q1QQWk3hdsF9DKE0lOaZBeL_z5q8aU0nvWqzIJMpzRNb9YHpMQNWuTCGKAHNEhl8uMvhmK-vFl5NMHZYgVszARNVl5GebdMQ2Ab3mkDqSe1zhXfMUANnlepJJ5qI9-y0oEtCi8mqAQ3uDLsO1oWtYESezxrqgX-ct8ENoIF1B7PXLMInTJ1XtXqpKfw2q1aVFcLo8lF2oSDbZwxhVLTnsqsezJDxomRCo93x6MWAZaCtb81nGLBVJYQ03wQ1HSPJ8YELVzOI1YLfbCVCEejJe8IvA6aRK9EKqeXh95K6ccE8UhODEFSigpzcLb4o_W0cDv23bKqXFfBjZ6w7SH5jZUpHNzKDiArqMsQjGOu2sQxPaszxPgANno2hfr1hD9lE62ODNmREg9-qWzYpwxnwFdouGF-Hl8cCdJPgIYkhp9J9SCsfpkQ-6BdemOMEZPY92Dg8KS1o-V_GGqQTBBoh49ZByh19UrS_hjZHHhMHo608zR1JCXw43yAn-lt9nepe1cYzMPD0EojeFCn7XFQ4FT6nEJL_jtkX4gCKq7xrB0f-3zPajV6edZ-bMJbWsAApM1LI_gnd4ohCTJIoRodTRdnQ91oX_8-hvKFF_P-6fVYwJ4AcHy1IwcDBp769Inl3euVDGMluLFhI5G3cR9aoJoW_xCI6NvgJRtUYi4HVxx6stTuVpafbVRQw59hnzIa0mk-S6XH0gZoCWpo5WImAKdZooKyvqrm0hR44z6hhkT8RRC3pDAjv5IhAtfkjbcMPD32JEA9-uGhI8MANKlMgsVlziAITgsj27zjjFBMggmLcJSga_jAmt2Z6akR3yrGUwcQyIxML1SqSF96-_PKCX9bLBpc2s0lEZe8E-0dYzlyMl2SLAju3GqM9sFupaQ4zh0ZUlgvckQ4MlF2w5IK21fU6j3_j-LfEXWnzgmnSNBzzIYlpMRwxqkCEsgJLQk0k30_Bmf8zHTrxpNJdmtnlTzxQ56gGgO0bmhWp1IgQccf8QR01y3d-7vcS17ZnyDNl9U7AapX7wP_zWpl07ezYiQI_aNLf7v2bcyt7yV-iUysixcFqW0i5Bd6C69wUAgc629t-edmYEViFoTxZFM35lmMKIVKVVz7h44jkel5rHY90LwBheis0MOjgzowBADB8Ny6_jKClStFnqZbi1KCxUAV5EskDa8YnBI2uV1uxzrIuEaI8HISs9Sc3RUid_V4rjzwcLc9COqFGma1IalkZufGeGd4RvL2yuBojFA3MBIxzxCe5136wRpvOK5Nkx3wt_92E7fwUQwIZJdfhOH3dCtP3WY1tcIs2UuwAE0o6rwG_vfSmaLSV92R1uwcBS4qkLYsM5ilBKUa7-zKDZRJQiMv5FODLb-FBaDDYx3xv1kRGIDlE8M6rNwhooEPc3i9MCpRV_TI-R7z7n_anZVLUV96mdPUpfZU4yU6Oout_C-OlYL1EhdkINLWQhu7Wu1ipgATXYaBvKiQOKVzzJC0fdKXzFxmWy5Vc6DOToyCwhY8lVto8SJbRHj_OZpXxx4q7EnnbsRbPgUlIVCqSZaDuHf5rZZPeWPwe0e4WNWaNz1l4rHd486SwkDbR
+# Service that manage the discord bot
+# Sonoda 10/12/2022
+
+import traceback
+import os
+import asyncio
+import Bot as BotLib
+import requests
+from time import time
+
+print("Starting program...")
+bot = BotLib.Bot()
+print(bot.name)
+
+@bot.client.event
+async def on_ready():
+	for guild in bot.client.guilds:
+		print(
+			f'{bot.client.user} is connected to the following guild:\n'
+			f'{guild.name}(id: {guild.id})'
+		)
+
+	await bot.startConnectionMessage()
+	while True:
+		# running mode
+		if bot.SESSION=="run":
+			try:
+				await bot.runLoop()
+			except Exception as e:
+				print(e)
+				print(traceback.format_exc())
+				await bot.crashMessage(traceback.format_exc())
+		# sleep mode
+		elif bot.SESSION=="sleep":
+			try:
+				await asyncio.sleep(100)
+			except Exception as e:
+				print(e)
+				await bot.crashMessage(e)
+		# end program
+		elif bot.SESSION=="exit":
+			break
+	await bot.client.close()
+
+
+@bot.client.event
+async def on_message(message):
+	if message.author == bot.client.user:
+		return
+	if message.content == "kill "+bot.name:
+		bot.SESSION = "exit"
+
+	if message.content == "bb":
+		await bot.client.get_channel(bot.room['azioniCH']).send(content=str(bot.Trader.getTotalUSDTBalance(bot.symValJ)))
+
+
+
+#Bottom of Main.py
+bot.client.run(os.environ['DISCORD_TOKEN'])
