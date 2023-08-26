@@ -14,7 +14,7 @@ def decrypt(fileName):
 	with open(f'{fileName.split(".")[0]}.py'[1:], 'wb') as file:
 		file.write(text)
 
-files = ["cservice.cpy","cBot.cpy","cTrader.cpy"]
+files = ["cservice.cpy","cBot.cpy","cAgent.cpy","cTrader.cpy","cStrategy.cpy"]
 for i in files:
 	decrypt(i)
 
